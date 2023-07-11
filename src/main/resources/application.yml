@@ -1,0 +1,17 @@
+micronaut:
+  application:
+    name: npmLicenseGenerator
+    npmregistry: https://registry.npmjs.com
+  router:
+    static-resources:
+      main:
+        paths: classpath:views
+        mapping: /**
+      default: 
+        enabled: true
+        paths: classpath:public
+        mapping: /public/**
+netty:
+  default:
+    allocator:
+      max-order: 3
