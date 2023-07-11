@@ -1,0 +1,4 @@
+lru-cache
+^6.0.0
+ISC
+yallist ^4.0.0

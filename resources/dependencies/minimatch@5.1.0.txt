@@ -1,0 +1,4 @@
+minimatch
+^5.1.0
+ISC
+brace-expansion ^2.0.1

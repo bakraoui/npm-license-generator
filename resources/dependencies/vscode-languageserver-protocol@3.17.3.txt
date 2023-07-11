@@ -1,0 +1,5 @@
+vscode-languageserver-protocol
+3.17.3
+MIT
+vscode-jsonrpc 8.1.0
+vscode-languageserver-types 3.17.3

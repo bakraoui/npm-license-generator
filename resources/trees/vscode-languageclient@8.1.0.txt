@@ -1,0 +1,10 @@
+vscode-languageclient 8.1.0
+|   |+-+ minimatch ^5.1.0
+|   |   |+-+ brace-expansion ^2.0.1
+|   |   |   |+-+ balanced-match ^1.0.0
+|   |+-+ semver ^7.3.7
+|   |   |+-+ lru-cache ^6.0.0
+|   |   |   |+-+ yallist ^4.0.0
+|   |+-+ vscode-languageserver-protocol 3.17.3
+|   |   |+-+ vscode-jsonrpc 8.1.0
+|   |   |+-+ vscode-languageserver-types 3.17.3

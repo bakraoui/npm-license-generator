@@ -1,0 +1,4 @@
+brace-expansion
+^2.0.1
+MIT
+balanced-match ^1.0.0
