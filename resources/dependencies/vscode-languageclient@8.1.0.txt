@@ -1,6 +1,0 @@
-vscode-languageclient
-8.1.0
-MIT
-minimatch ^5.1.0
-semver ^7.3.7
-vscode-languageserver-protocol 3.17.3

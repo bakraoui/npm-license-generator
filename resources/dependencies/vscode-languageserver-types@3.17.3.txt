@@ -1,3 +1,0 @@
-vscode-languageserver-types
-3.17.3
-MIT

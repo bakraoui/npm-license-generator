@@ -1,4 +1,0 @@
-semver
-^7.3.7
-ISC
-lru-cache ^6.0.0

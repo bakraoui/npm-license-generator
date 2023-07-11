@@ -1,3 +1,0 @@
-vscode-jsonrpc
-8.1.0
-MIT

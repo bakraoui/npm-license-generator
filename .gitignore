@@ -15,3 +15,11 @@ out/
 .factorypath
 bin/
 .setting/
+resources/contributes/**
+resources/copyrights/**
+resources/dependencies/**
+resources/licenses/**
+resources/logs/**
+resources/notices/**
+resources/sub-licenses/**
+resources/trees/**
