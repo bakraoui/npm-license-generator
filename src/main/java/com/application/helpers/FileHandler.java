@@ -60,15 +60,13 @@ public class FileHandler {
         FileReader reader = new FileReader(file);
         BufferedReader bufferedReader = new BufferedReader(reader);
         String line = bufferedReader.readLine();
-        // dependency.setName(line);
         line = bufferedReader.readLine();
-        // dependency.setVersion(line);
         line = bufferedReader.readLine();
         dependency.setLicenseType(line);
         line = bufferedReader.readLine();
         while (line != null) {
             String[] array = line.split(" ");
-            dependencies.add(new Dependency(array[0], array[1],new ArrayList<>()));
+            dependencies.add(new Dependency(array[0], array[1]));
             line = bufferedReader.readLine();
         }
         bufferedReader.close();

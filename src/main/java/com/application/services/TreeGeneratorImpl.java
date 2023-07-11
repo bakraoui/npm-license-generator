@@ -42,7 +42,6 @@ public class TreeGeneratorImpl implements TreeGenerator {
         checkDependencyValidation(dependency);
 
         if(!isDependencyExist(name, version)) {
-            logger.error("No package exist: " + name + " " + version);
             throw new DependencyNotFoundException("No package exist, check the name or version of your package");
         }
         
@@ -52,30 +51,25 @@ public class TreeGeneratorImpl implements TreeGenerator {
 
         logger.info("Start generating tree for " + name +"@" + version);
         if (newFile.exists()) {
-            logger.info("--------- The tree was generated successfully.");
             return newFile;
         }
 
         StringBuilder tree = new StringBuilder();
 
-        // tree.append(name + " " + version + "\n");
         tree.append(name)
             .append(" ")
             .append(version)
             .append("\n");
         
-        logger.info("--------- Start Extracting List of dependencies.");
+        logger.info("\tStart Extracting List of dependencies.");
         dependency = getListOfDependencies(dependency, 1);
-        logger.info("--------- Dependencies Extracted successfully.");
-        logger.info("--------- Start creating the tree from dependencies...");
+        logger.info("\tDependencies Extracted successfully.");
+        logger.info("\tStart creating the tree from dependencies...");
         converListOfDependenciesToTree(dependency, tree);
-        logger.info("--------- Tree created successfully.");
+        logger.info("Tree created successfully.");
 
         FileWriter writer =  new FileWriter(newFile);
         writer.append(tree);
-
-        logger.info("--------- The tree is ready to download.");
-
         writer.close();
 
         return newFile;
@@ -101,7 +95,7 @@ public class TreeGeneratorImpl implements TreeGenerator {
         String path = PathHandler.prepareFilePathname("dependencies", dependency);
         File dependencyFile = new File(path);
         
-        logger.info(dependency.getName()+" "+dependency.getVersion());
+        logger.info("\tStart extracting Dependencies for " + dependency.getName() +"@" +dependency.getVersion());
         Dependency nodePackage;
         if (dependencyFile.exists()) {
             nodePackage = FileHandler.getDependencyFromCache(dependency);
@@ -122,13 +116,16 @@ public class TreeGeneratorImpl implements TreeGenerator {
         
 
         List<Dependency> dependencies = new ArrayList<>();
+        logger.info("\t** "+ dependency.getName()+" has " + nodePackage.getDependencies().size() + " dependency.");
         
         for (Dependency dep : nodePackage.getDependencies()) {
-            logger.info("------- Start extracting Dependencies for " + dep.getName() +"@" +dep.getVersion());
+            logger.info("\t**** " + dep.getName() + "@" + dep.getVersion());
+        }
+        
+        for (Dependency dep : nodePackage.getDependencies()) {
             dep.setLevel(level);
             Dependency p = getListOfDependencies(dep,  level + 1);
             dependencies.add(p);
-            logger.info("------- End of Extracting Dependencies for " + dep.getName() +"@" +dep.getVersion());
 
         }
         dependency.setDependencies(dependencies);
@@ -138,7 +135,6 @@ public class TreeGeneratorImpl implements TreeGenerator {
 
     private void converListOfDependenciesToTree(Dependency dependency, StringBuilder tree) {
     
-        logger.info("------- Start coverting Dependencies to tree " );
 
         for (Dependency dep : dependency.getDependencies()) {
             if(tree.toString().contains("+-+ " + dep.getName() + " " + dep.getVersion())){
@@ -160,7 +156,6 @@ public class TreeGeneratorImpl implements TreeGenerator {
             
         }
 
-        logger.info("------- Coverting Dependencies to tree is completed." );
 
 
     }

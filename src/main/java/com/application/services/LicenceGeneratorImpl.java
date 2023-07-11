@@ -56,7 +56,7 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
         writer.write(license.toString());
         logger.info("\twriting license content to license file");
         logger.info("License Generated Successfully.");
-
+        writer.close();
         return licenseFile;
     }
 
@@ -86,21 +86,20 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
 
         logger.info("\tStart generation license for:  " + name +"@"+version);
 
-        // Added content
         if (dependencyFile.exists()) {
             dependency = FileHandler.getDependencyFromCache(dependency);
         }
         
-        // End of added content
-
         license.append("\n------------------ START OF DEPENDENCY LICENCE --------------------\n")
                .append("- " )
                .append(dependency.getName());
 
         String copyrights;
+        
         if (copyrightsFile.exists()) {
             copyrights = FileHandler.readFileContent(copyrightsFile);
-        } else {
+        } 
+        else {
             copyrights = getCopyrights(dependency);
             FileHandler.createFile(copyrightsPathname, copyrights);
         }
@@ -175,7 +174,7 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
                 
             } 
             else {
-                logger.info("\tlicense not founded for " + dependency.getName() + "@"+dependency.getVersion());
+                logger.info("\t** License not founded.");
             }
             
         }
@@ -196,7 +195,7 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
                 FileHandler.createFile(noticePathname, notice);
                 
             } else {
-                logger.info("\tNotice not founded for " + dependency.getName() + "@"+dependency.getVersion());
+                logger.info("\t** Notice not founded.");
             }
             
         }
@@ -219,7 +218,7 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
                 FileHandler.createFile(contributesPathname, contributes);
                 
             } else {
-                logger.info("\tContributes not founded for " + dependency.getName() + "@"+dependency.getVersion());
+                logger.info("\t** Contributes not founded." );
             }
             
         }
