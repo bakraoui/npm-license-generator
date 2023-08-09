@@ -58,7 +58,7 @@ let isVersionValid = (input) => {
         return false;
     }
     
-    let specialChars = [" ", "&", "~", "{", "}", "(", ")", "[", "]", "//", "#", "$", "%", "-", "_", "\\", "^"]
+    let specialChars = [" ", "&", "~", "{", "}", "(", ")", "[", "]", "//", "#", "$", "%", "\\", "^"]
     for (let i = 0; i < specialChars.length; i++) {
         if (input.includes(specialChars[i])) {
                 return false;

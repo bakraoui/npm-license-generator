@@ -27,7 +27,7 @@ public interface DependencyValidator extends Function<Dependency, DependencyVali
         return dependency -> {
 
             Pattern pattern = Pattern.compile( "[~^(){}#=+&\'\\/:;,?]", Pattern.CASE_INSENSITIVE );
-            Matcher matcher = pattern.matcher(dependency.getName());
+            Matcher matcher = pattern.matcher(dependency.getVersion());
             
             return dependency.getName() == null 
                         || matcher.find() ?  
