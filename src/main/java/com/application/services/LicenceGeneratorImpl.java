@@ -90,7 +90,7 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
             dependency = FileHandler.getDependencyFromCache(dependency);
         }
         
-        license.append("\n------------------ START OF DEPENDENCY LICENCE --------------------\n")
+        license.append("\n------------------ START OF DEPENDENCY LICENSE --------------------\n")
                .append("- " )
                .append(dependency.getName());
 
@@ -224,7 +224,7 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
         }
         
 
-        license.append("------------------ END OF DEPENDENCY LICENCE --------------------\n\n\n\n");
+        license.append("------------------ END OF DEPENDENCY LICENSE --------------------\n\n\n\n");
 
         for (Dependency dep : dependency.getDependencies()) {
             getLicense(dep, license);
