@@ -1,7 +1,9 @@
 micronaut:
   application:
     name: npmLicenseGenerator
-    npmregistry: https://registry.npmjs.com
+    npm-registry: https://registry.npmjs.com
+  server:
+    port: 8081
   router:
     static-resources:
       main:

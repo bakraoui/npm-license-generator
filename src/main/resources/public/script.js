@@ -1,13 +1,11 @@
 let submit = document.getElementById("form-submit");
 
-const REQUEST_URL = (dependency) => `http://localhost:8080/${dependency.name}/${dependency.version}`
+const REQUEST_URL = (dependency) => `http://localhost:8081/${dependency.name}/${dependency.version}`
 
 let dependency = {
     name:"",
     version:""
 }
-
-let inputs = document.getElementsByTagName("form")[0];
 
 let dependencyName = document.getElementById("name");
 dependencyName.addEventListener("input", (e) => {
@@ -37,7 +35,6 @@ dependencyVersion.addEventListener("input", (e) => {
 })
 
 let isNameValid = (input) => {
-
     if (input.length === 0) {
         return false;
     }
@@ -53,7 +50,6 @@ let isNameValid = (input) => {
 }
 
 let isVersionValid = (input) => {
-    
     if (input.length === 0) {
         return false;
     }
@@ -61,15 +57,12 @@ let isVersionValid = (input) => {
     let specialChars = [" ", "&", "~", "{", "}", "(", ")", "[", "]", "//", "#", "$", "%", "\\", "^"]
     for (let i = 0; i < specialChars.length; i++) {
         if (input.includes(specialChars[i])) {
-                return false;
+           return false;
         }
     }
 
-    if(!input.match(/[0-9]*\.[0-9]*\./)) {
-        return false;
-    }
+    return input.match(/[0-9]*\.[0-9]*\./);
 
-    return true;
 }
 
 submit.onsubmit = (e) => {
@@ -80,7 +73,7 @@ submit.onsubmit = (e) => {
     }
     let url = REQUEST_URL(dependency)
     
-    document.querySelector("#generate-license").setAttribute("disabled", true)
+    document.querySelector("#generate-license").setAttribute("disabled", "true")
     let download = document.querySelector("#download");
         download.classList.remove("visible");
         download.classList.add("hidden");
@@ -113,6 +106,10 @@ submit.onsubmit = (e) => {
             loading.classList.remove( "visible");
             loading.classList.add(  "hidden");
             document.querySelector("#generate-license").removeAttribute("disabled")
+        }).catch(function (error) {
+            setMessage("Something went wrong. Please try again.", "error");
+            download.classList.remove( "visible");
+            download.classList.add( "hidden");
         });
 
     
@@ -124,12 +121,12 @@ submit.onsubmit = (e) => {
 function prepareDownloadUrls(filename) {
 
     document.getElementById("license")
-        .setAttribute("href", "http://localhost:8080/license/"+filename);
+        .setAttribute("href", "http://localhost:8081/license/"+filename);
     document.getElementById("tree")
-        .setAttribute("href", "http://localhost:8080/tree/"+filename);
+        .setAttribute("href", "http://localhost:8081/tree/"+filename);
 
     document.getElementById("log")
-        .setAttribute("href", "http://localhost:8080/log/"+filename);
+        .setAttribute("href", "http://localhost:8081/log/"+filename);
 
 }
 

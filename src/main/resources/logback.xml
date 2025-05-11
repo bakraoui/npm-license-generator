@@ -31,11 +31,5 @@
         <appender-ref ref="FILE" />
     </root>
 
-    <!-- <Loggers>
-        <Root level="info">
-            <AppenderRef ref="Sentry" level="error "/>
-            <AppenderRef ref="myLog" level="info" />
-        </Root>
-    </Loggers> -->
 
 </configuration>

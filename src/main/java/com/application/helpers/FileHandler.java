@@ -21,32 +21,36 @@ import com.application.entities.Dependency;
  */
 public class FileHandler {
 
+    private FileHandler() {
+        throw new IllegalStateException("Utility class");
+    }
 
     public static void createFile(String directory, String content) throws IOException {
         File file = new File(directory);
-        FileWriter writer = new FileWriter(file);
-        writer.write(content);
-        writer.close();
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(content);
+        }
     }
 
 
     public static String readFileContent(File file) throws IOException {
         FileReader reader = new FileReader(file);
-        BufferedReader bufferedReader = new BufferedReader(reader);
+        StringBuilder content;
+        try (BufferedReader bufferedReader = new BufferedReader(reader)) {
 
-        StringBuilder content = new StringBuilder("");
-        String line = bufferedReader.readLine();
+            content = new StringBuilder();
+            String line = bufferedReader.readLine();
 
-        if (line.trim().equals("") || line.trim().isBlank() ) {
-            line = bufferedReader.readLine();
+            if (line.trim().isBlank()) {
+                line = bufferedReader.readLine();
+            }
+
+            while (line != null) {
+                content.append(line).append("\n");
+                line = bufferedReader.readLine();
+            }
+
         }
-
-        while (line != null) {
-            content.append(line + "\n");
-            line = bufferedReader.readLine();
-        }
-
-        bufferedReader.close();
         reader.close();
 
         return content.toString();
@@ -54,22 +58,22 @@ public class FileHandler {
 
 
     public static Dependency getDependencyFromCache(Dependency dependency) throws IOException {
-        String dependenciesPath = PathHandler.prepareFilePathname("dependencies", dependency);
+        String dependenciesPath = PathHandler.prepareFilePathname("dependencies", dependency.getName(), dependency.getVersion());
         List<Dependency> dependencies = new ArrayList<>();
         File file = new File(dependenciesPath);
         FileReader reader = new FileReader(file);
-        BufferedReader bufferedReader = new BufferedReader(reader);
-        String line = bufferedReader.readLine();
-        line = bufferedReader.readLine();
-        line = bufferedReader.readLine();
-        dependency.setLicenseType(line);
-        line = bufferedReader.readLine();
-        while (line != null) {
-            String[] array = line.split(" ");
-            dependencies.add(new Dependency(array[0], array[1]));
+        try (BufferedReader bufferedReader = new BufferedReader(reader)) {
+            String line = bufferedReader.readLine();
             line = bufferedReader.readLine();
+            line = bufferedReader.readLine();
+            dependency.setLicenseType(line);
+            line = bufferedReader.readLine();
+            while (line != null) {
+                String[] array = line.split(" ");
+                dependencies.add(new Dependency(array[0], array[1]));
+                line = bufferedReader.readLine();
+            }
         }
-        bufferedReader.close();
         reader.close();
         dependency.setDependencies(dependencies);
         return dependency;

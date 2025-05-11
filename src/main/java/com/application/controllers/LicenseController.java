@@ -7,21 +7,18 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.channels.FileChannel;
 
-import com.application.entities.Dependency;
-import com.application.helpers.FileHandler;
+import com.application.exceptions.LicenseNotFoundException;
 import com.application.helpers.PathHandler;
 import com.application.services.LicenceGenerator;
 import com.application.services.TreeGenerator;
 
-import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.server.types.files.SystemFile;
-import io.micronaut.serde.annotation.Serdeable.Serializable;
 
-@Controller("/")
+@Controller()
 public class LicenseController {
 
 
@@ -40,15 +37,15 @@ public class LicenseController {
         pw.close();
 
         File treefile = treeGenerator.getTreeFile(name, version);
-        licenceGenerator.getLicenseFile(name, version);
-        
+        File licenseFile = licenceGenerator.getLicenseFile(name, version);
+
         Response response = new Response();
         response.setFilename(treefile.getName());
         response.setStatus(HttpStatus.OK);
 
         try {
             
-            String pathname = PathHandler.prepareFilePathname("logs", new Dependency(name, version));
+            String pathname = PathHandler.prepareFilePathname("logs", name, version);
             File logsNewFileDirectory = new File(pathname);
 
             if (!logsNewFileDirectory.exists()) {
@@ -71,61 +68,38 @@ public class LicenseController {
     }
 
     @Get("/license/{filename}")
-    public SystemFile downloadLicense(String filename) throws IOException{
+    public SystemFile downloadLicense(String filename){
         try {
             File file = new File("resources/licenses/" + filename);
             return new SystemFile(file).attach("license:"+filename);
         } catch (Exception e) {
-            throw new RuntimeException("License Not Found. please generate it again.");
+            throw new LicenseNotFoundException("License Not Found. please generate it again.");
         }
         
     }
     
 
     @Get("/tree/{filename}")
-    public SystemFile downloadTree(String filename) throws IOException{
+    public SystemFile downloadTree(String filename){
         try {
             File file = new File("resources/trees/" + filename);
             return new SystemFile(file).attach("tree:"+filename);
         } catch (Exception e) {
-            throw new RuntimeException("License Not Found. please generate it again.");
+            throw new LicenseNotFoundException("License Not Found. please generate it again.");
         }
         
     }
 
     @Get("/log/{filename}")
-    public SystemFile downloadLogs(String filename) throws IOException{
+    public SystemFile downloadLogs(String filename){
         try {
             File file = new File("resources/logs/" + filename);
             return new SystemFile(file).attach("log:"+filename);
         } catch (Exception e) {
-            throw new RuntimeException("LogFile Not Found. ");
+            throw new LicenseNotFoundException("LogFile Not Found. ");
         }
         
     }
 
 }
 
-@Serializable
-@Introspected
-class Response {
-    private String filename;
-    private HttpStatus status;
-    public String getFilename() {
-        return filename;
-    }
-
-    public HttpStatus getStatus() {
-        return status;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
-    public void setStatus(HttpStatus status) {
-        this.status = status;
-    }
-
-
-}

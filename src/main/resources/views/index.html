@@ -10,39 +10,34 @@
     <title>License Generator</title>
 </head>
 <body>
-
     <div class="container">
         <main>
             <div class="search-form">
                 <form method="post" id="form-submit">
                     <div class="form-group">
-
                         <div class="form-control">
                             <label for="name">Name</label>
                             <input type="text" name="name" id="name" required>
-        
                         </div>
 
                         <div class="form-control">
                             <label for="version">Version</label>
                             <input type="text" name="version" id="version" required>
-                            
                         </div>   
 
                     </div>
 
-                    
                     <div class="submit-btn">
                         <button type="submit" id="generate-license">Generate License</button>
                     </div>
 
                 </form>
-                <div id="input-error" width="100">Check inputs, no special characters and speces allowed.</div>
+                <div id="input-error" width="100">Check inputs, no special characters and spaces allowed.</div>
             </div>
             <div id="download" class="hidden">
-                <a id="license" class="btn" > download license</a><br>
-                <a id="tree" class="btn"> download tree</a> 
-                <a id="log" class="btn"> download Log File</a> 
+                <a id="license" class="btn" >download license</a><br>
+                <a id="tree" class="btn">download tree</a>
+                <a id="log" class="btn">download Log File</a>
             </div>
 
             <div id="loading" class="hidden">

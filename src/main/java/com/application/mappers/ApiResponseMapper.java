@@ -11,38 +11,34 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class ApiResponseMapper {
-    
 
-    public static Dependency mapNPMRegitryResponseToDependency(String response) throws IOException, NoSuchFieldException, SecurityException {
+    private ApiResponseMapper() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    public static Dependency mapNPMRegitryResponseToDependency(String response) throws IOException, SecurityException {
         ObjectMapper mapper = new ObjectMapper();
 
-        Map<String, Object> map =(Map<String, Object>) mapper
-                    .readValue(response, new TypeReference<Map<String, Object>>(){});
+        Map<String, Object> map = mapper
+                    .readValue(response, new TypeReference<>() {
+                    });
        
             
         List<Dependency> dependencies = new ArrayList<>();
         
         if(map.containsKey("dependencies")){
             Map<String, String> mapDependencies = (Map<String, String>) map.get("dependencies");
-                
-            mapDependencies.forEach((key, value) -> {
-                dependencies.add(new Dependency(key, value, null));
-            });            
+            mapDependencies.forEach((key, value) -> dependencies.add(new Dependency(key, value, null)));
         }
 
         String licenseType = "";
         if (map.containsKey("license")) {
             licenseType = map.get("license").toString();
-        }
 
-        else if (map.containsKey("licenses")) {
-
+        } else if (map.containsKey("licenses")) {
             List<Map<String, String>> licenses = (List<Map<String, String>>) map.get("licenses");
-
             licenseType = licenses.get(0).get("type");
-
         }
-
 
         Dependency dependency = new Dependency();
         dependency.setName(map.get("name").toString());

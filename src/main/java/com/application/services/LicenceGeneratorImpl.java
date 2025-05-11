@@ -24,21 +24,21 @@ import jakarta.inject.Singleton;
 @Singleton
 public class LicenceGeneratorImpl implements LicenceGenerator {
 
-    private final Logger logger = (Logger) LoggerFactory.getLogger(LicenceGenerator.class);
+    private final Logger logger = (Logger) LoggerFactory.getLogger(LicenceGeneratorImpl.class);
     
     private static final String LICENSE = "licen";
     private static final String NOTICE = "notice";
-    private static final String CONTRIBUT = "contribut";
+    private static final String CONTRIBUTE = "contribut";
     private static final String HTTPS_UNPKG_COM_BROWSE = "https://unpkg.com/browse/";
     
 
     @Override
-    public File getLicenseFile(String name, String version) throws NoSuchFieldException, SecurityException, IOException {
+    public File getLicenseFile(String name, String version) throws SecurityException, IOException {
         
         name = name.replace("__", "/");
         Dependency dependency = new Dependency(name, version);
 
-        String pathname = PathHandler.prepareFilePathname("licenses",dependency);
+        String pathname = PathHandler.prepareFilePathname("licenses",name, version);
         File licenseFile = new File(pathname);
         
         if (licenseFile.exists()) {
@@ -50,41 +50,42 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
         StringBuilder license = new StringBuilder();
         getLicense(dependency, license); 
         logger.info("\tlicense content is generated successfully");
-        
-        FileWriter writer =  new FileWriter(licenseFile);
-        logger.info("\tstart creating license file...");
-        writer.write(license.toString());
-        logger.info("\twriting license content to license file");
-        logger.info("License Generated Successfully.");
-        writer.close();
+
+        try (FileWriter writer = new FileWriter(licenseFile)) {
+            logger.info("\tstart creating license file...");
+            writer.write(license.toString());
+            logger.info("\twriting license content to license file");
+            logger.info("License Generated Successfully.");
+        }
         return licenseFile;
     }
 
 
     @Override
-    public void getLicense(Dependency dependency, StringBuilder license) throws NoSuchFieldException, SecurityException, IOException {
-        
-        if(license.toString().contains("- " + dependency.getName())){ 
+    public void getLicense(Dependency dependency, StringBuilder license) throws SecurityException, IOException {
+
+        String dependencyName = dependency.getName();
+        String dependencyVersion = dependency.getVersion();
+        if(license.toString().contains("- " + dependencyName)){
             return;
         }
 
-        String LicensePathname = PathHandler.prepareFilePathname("sub-licenses", dependency);
-        String noticePathname = PathHandler.prepareFilePathname("notices", dependency);
-        String contributesPathname = PathHandler.prepareFilePathname("contributes", dependency);
-        String copyrightsPathname = PathHandler.prepareFilePathname("copyrights", dependency);
-        String dependencyPathname = PathHandler.prepareFilePathname("dependencies", dependency);
+        String licensePathname = PathHandler.prepareFilePathname("sub-licenses", dependencyName, dependencyVersion);
+        String noticePathname = PathHandler.prepareFilePathname("notices", dependencyName, dependencyVersion);
+        String contributesPathname = PathHandler.prepareFilePathname("contributes", dependencyName, dependencyVersion);
+        String copyrightsPathname = PathHandler.prepareFilePathname("copyrights", dependencyName, dependencyVersion);
+        String dependencyPathname = PathHandler.prepareFilePathname("dependencies", dependencyName, dependencyVersion);
 
-        File licenseFile = new File(LicensePathname);
+        File licenseFile = new File(licensePathname);
         File noticeFile = new File(noticePathname);
         File contributesFile = new File(contributesPathname);
         File copyrightsFile = new File(copyrightsPathname);
         File dependencyFile = new File(dependencyPathname);
 
-        String name = dependency.getName();
-        String version = PathHandler.prepareValidVersionName(dependency.getVersion()); 
+        String version = PathHandler.prepareValidVersionName(dependency.getVersion());
         dependency.setVersion(version);
 
-        logger.info("\tStart generation license for:  " + name +"@"+version);
+        logger.info("\tStart generation license for:  {}@{}", dependencyName, version);
 
         if (dependencyFile.exists()) {
             dependency = FileHandler.getDependencyFromCache(dependency);
@@ -92,7 +93,7 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
         
         license.append("\n------------------ START OF DEPENDENCY LICENSE --------------------\n")
                .append("- " )
-               .append(dependency.getName());
+               .append(dependencyName);
 
         String copyrights;
         
@@ -104,7 +105,7 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
             FileHandler.createFile(copyrightsPathname, copyrights);
         }
 
-        if (copyrights != null && !copyrights.trim().equals("")) {
+        if (!copyrights.trim().isEmpty()) {
             license.append("\n\n").append(copyrights).append("\n");
         }
 
@@ -114,9 +115,9 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
             
             String licenseContent = FileHandler.readFileContent(licenseFile);
             
-            if (dependency.getLicenseType() == null || dependency.getLicenseType().equals("")) {
+            if (dependency.getLicenseType() == null || dependency.getLicenseType().isEmpty()) {
                 String licenseType = getLicenseType(licenseContent);
-                if (licenseType.equals("")) {
+                if (licenseType.isEmpty()) {
                     license.append("\n").append(licenseContent).append("\n");
                 }
                 else {
@@ -143,12 +144,12 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
         } 
         else {
             String licenseName = filenames.get(LICENSE);
-            if(!licenseName.equals("")){
-                String URL = prepareURLToBrowseFile(dependency, licenseName);
-                String subLicense = getFileContentFromUnpkg( URL );
-                if ( dependency.getLicenseType() == null || dependency.getLicenseType().equals("") ) {
+            if(!licenseName.isEmpty()){
+                String url = prepareURLToBrowseFile(dependency, licenseName);
+                String subLicense = getFileContentFromUnpkg( url );
+                if ( dependency.getLicenseType() == null || dependency.getLicenseType().isEmpty()) {
                     String licenseType = getLicenseType(subLicense);
-                    if (licenseType.equals("")) {
+                    if (licenseType.isEmpty()) {
                         license.append("\n").append(subLicense).append("\n");
                     }else {
                         if (!license.toString().contains(licenseType)) {
@@ -170,7 +171,7 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
                     .append(dependency.getLicenseType()).append("\n").append("\n");
                 }
                 
-                FileHandler.createFile(LicensePathname, subLicense);
+                FileHandler.createFile(licensePathname, subLicense);
                 
             } 
             else {
@@ -187,8 +188,8 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
         }
         else {
             String noticeName = filenames.get(NOTICE);
-            if(!noticeName.equals("")){
-                String notice = getFileContentFromUnpkg( HTTPS_UNPKG_COM_BROWSE + name + "@" + version + "/" + noticeName );
+            if(!noticeName.isEmpty()){
+                String notice = getFileContentFromUnpkg( HTTPS_UNPKG_COM_BROWSE + dependencyName + "@" + version + "/" + noticeName );
                 license.append("\n--------- Notice ---------\n")
                         .append(notice).append("\n");
            
@@ -207,10 +208,10 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
                     .append(contributesContent).append("\n");
         } 
         else {
-            String contributesName = filenames.get(CONTRIBUT);
-            if(!contributesName.equals("")){
-                String URL = prepareURLToBrowseFile(dependency, name);
-                String contributes = getFileContentFromUnpkg( URL );
+            String contributesName = filenames.get(CONTRIBUTE);
+            if(!contributesName.isEmpty()){
+                String url = prepareURLToBrowseFile(dependency, dependencyName);
+                String contributes = getFileContentFromUnpkg( url );
                 license.append("\n--------- Contributes ---------\n")
                         .append(contributes)
                         .append("\n");
@@ -222,8 +223,6 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
             }
             
         }
-        
-
         license.append("------------------ END OF DEPENDENCY LICENSE --------------------\n\n\n\n");
 
         for (Dependency dep : dependency.getDependencies()) {
@@ -235,13 +234,13 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
 
     public String getFileContentFromUnpkg(String url) throws IOException  {
     
-        StringBuilder fileContent = new StringBuilder("");  
+        StringBuilder fileContent = new StringBuilder();
         Elements elements;
         try {
             Document document = Jsoup.connect(url).header( "Cookie", "ZvcurrentVolume=100; zvAuth=1; zvLang=0; ZvcurrentVolume=100; notice=11").get();
             elements = document.getElementsByAttributeValueContaining("id", "lc");
         } catch (Exception e) {
-            logger.error("\tFailed to get content from: " + url);
+            logger.error("\tFailed to get content from: {}", url);
             return "";
         }
         
@@ -265,27 +264,27 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
   
     public Map<String, String> getLicenseNoticeContributesFileNames(Dependency dependency) throws IOException {
                
-        String LINK_TO_BROWSE = prepareURLToBrowseFile(dependency, "");
+        String urlToBrowseFile = prepareURLToBrowseFile(dependency, "");
         Document document;
 
         Map<String, String> filesFullName = new HashMap<>();
         filesFullName.put(LICENSE, "");
         filesFullName.put(NOTICE, "");
-        filesFullName.put(CONTRIBUT, "");
+        filesFullName.put(CONTRIBUTE, "");
 
         try {
-            document = Jsoup.connect(LINK_TO_BROWSE)
+            document = Jsoup.connect(urlToBrowseFile)
                 .header("Cookie", "ZvcurrentVolume=100; zvAuth=1; zvLang=0; ZvcurrentVolume=100; notice=11")
                 .get();
         } catch (Exception e) {
-            logger.error("\tCannot get License, Contributes, notices for : " + dependency.getName()+"@"+dependency.getVersion());
+            logger.error("\tCannot get License, Contributes, notices for : {}@{} ", dependency.getName(), dependency.getVersion());
             return filesFullName;
         }
         
 
         Elements license =  document.getElementsByAttributeValueContaining("title", LICENSE);
         Elements notice =  document.getElementsByAttributeValueContaining("title", NOTICE);
-        Elements contributes =  document.getElementsByAttributeValueContaining("title", CONTRIBUT);
+        Elements contributes =  document.getElementsByAttributeValueContaining("title", CONTRIBUTE);
 
         String licenseFullName = !license.isEmpty() ? license.first().text(): "";
         String noticeFullName = !notice.isEmpty() ? notice.first().text(): "";
@@ -293,7 +292,7 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
 
         filesFullName.put(LICENSE, licenseFullName);
         filesFullName.put(NOTICE, noticeFullName);
-        filesFullName.put(CONTRIBUT, contributesFullName);
+        filesFullName.put(CONTRIBUTE, contributesFullName);
         
         return filesFullName;
     }
@@ -313,21 +312,21 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
 
     private String getCopyrights(Dependency dependency) throws IOException {
 
-        String LINK_TO_BROWSE = prepareURLToBrowseFile(dependency, "");
+        String urlToBrowseFile = prepareURLToBrowseFile(dependency, "");
         
         Elements elements;
         try {
-            Document document = Jsoup.connect(LINK_TO_BROWSE).header("Cookie", "ZvcurrentVolume=100; zvAuth=1; zvLang=0; ZvcurrentVolume=100; notice=11").get();
+            Document document = Jsoup.connect(urlToBrowseFile).header("Cookie", "ZvcurrentVolume=100; zvAuth=1; zvLang=0; ZvcurrentVolume=100; notice=11").get();
             elements = document.getElementsByAttribute("title");
         } catch (Exception e) {
             logger.error("\tFailed to get copyrights for: " + dependency.getName()+"@"+dependency.getVersion());
             return "";
         }
         
-        StringBuilder copyrights = new StringBuilder("");
+        StringBuilder copyrights = new StringBuilder();
         for (Element element : elements) {
             String l = element.attr("href");
-            // getCopyright(dependency, LINK_TO_BROWSE + l, copyrights);
+            // getCopyright(dependency, urlToBrowseFile + l, copyrights);
 
             // Added Content
             if (!l.endsWith("/")) {
@@ -345,10 +344,10 @@ public class LicenceGeneratorImpl implements LicenceGenerator {
                 els.forEach(el -> {
                     String line = el.text();
                     line = line.replace("*", "")
-                                    .replace("/*", "")
-                                    .replace("//", "")
-                                    .replace("#", "")
-                                    .trim();
+                        .replace("/*", "")
+                        .replace("//", "")
+                        .replace("#", "")
+                        .trim();
                     if (
                         (line.contains("Copyright ")) 
                         && line.length() < 200

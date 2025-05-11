@@ -51,7 +51,6 @@ main {
 
 .form-control label {
     margin-bottom: 10px;
-    /* color: white; */
 }
 
 .form-control input {
@@ -139,7 +138,6 @@ main {
     display: none;
     font-size: 14px;
 }
-
 
 
 /* Loading */

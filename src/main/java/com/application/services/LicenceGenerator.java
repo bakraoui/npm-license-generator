@@ -8,7 +8,7 @@ import com.application.entities.Dependency;
 
 public interface LicenceGenerator {
     
-    public File getLicenseFile(String name, String version) throws NoSuchFieldException, SecurityException, IOException;
-    public void getLicense(Dependency dependency, StringBuilder license) throws NoSuchFieldException, SecurityException, IOException;
+    File getLicenseFile(String name, String version) throws NoSuchFieldException, SecurityException, IOException;
+    void getLicense(Dependency dependency, StringBuilder license) throws NoSuchFieldException, SecurityException, IOException;
 
 }
